@@ -39,6 +39,8 @@ static int getMaxAttempts(Difficulty mode)
 		case Difficulty::Medium: return 7;
 		case Difficulty::Hard: return 5;
 	}
+
+	return 7;
 }
 
 static int generateRandom()
