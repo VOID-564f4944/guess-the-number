@@ -5,12 +5,14 @@
 
 namespace
 {
+    // Inclusive bounds for the secret number
 	constexpr int MIN = 1;
 	constexpr int MAX = 100;
 }
 
 enum class Difficulty
 {
+    // Difficulty levels map to different numbers of allowed attempts
 	Easy,
 	Medium,
 	Hard
@@ -18,6 +20,7 @@ enum class Difficulty
 
 enum class GuessResult
 {
+    // Result of comparing a guess to the target number
 	Low,
 	High,
 	Correct
@@ -25,6 +28,7 @@ enum class GuessResult
 
 static GuessResult evaluateGuess(int guess, int target)
 {
+    // Compare the player's guess with the target
 	if (guess < target) return GuessResult::Low;
 	if (guess > target) return GuessResult::High;
 
@@ -39,12 +43,13 @@ static int getMaxAttempts(Difficulty mode)
 		case Difficulty::Medium: return 7;
 		case Difficulty::Hard: return 5;
 	}
-
+	// Fallback to medium if an unknown value is provided
 	return 7;
 }
 
 static int generateRandom()
 {
+    // Create static RNG objects so the engine and distribution persist across calls
 	static std::random_device entropy;
 	static std::mt19937 engine(entropy());
 	static std::uniform_int_distribution <int> dist(MIN, MAX);
@@ -60,6 +65,7 @@ static int playGame(int target, int max_attempts)
 
 	while (attempts < max_attempts)
 	{
+        // Prompt the player for a guess
 		std::cout << "Attempt " << (attempts + 1) << '/' << max_attempts << ". Enter your guess: ";
 		std::cin >> guess;
 
@@ -67,12 +73,14 @@ static int playGame(int target, int max_attempts)
 		{
 			std::cin.clear();
 			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            // Handle non-numeric input
 			std::cout << "Invalid input. Please enter a number.\n";
 			continue;
 		}
 
 		if (guess < MIN || guess > MAX)
 		{
+            // Enforce bounds
 			std::cout << "Please enter a number between " << MIN << " and " << MAX << ".\n";
 			continue;
 		}
@@ -96,6 +104,7 @@ static int playGame(int target, int max_attempts)
 				auto end = std::chrono::steady_clock::now();
 				auto seconds = std::chrono::duration_cast<std::chrono::seconds>(end - start);
 
+                // Report success with attempts and time taken
 				std::cout << "Correct! You win.\n";
 				std::cout << "You guessed it in " << attempts << " attempts.\n";
 				std::cout << "Time taken: " << seconds.count() << " seconds\n";
@@ -112,6 +121,7 @@ static int playGame(int target, int max_attempts)
 
 int main()
 {
+    // Track best (fewest) attempts per difficulty; initialize to max int
 	int best_easy = std::numeric_limits<int>::max();
 	int best_medium = std::numeric_limits<int>::max();
 	int best_hard = std::numeric_limits<int>::max();
@@ -133,6 +143,7 @@ int main()
 			choice = 2;
 		}
 
+        // Map numeric selection to Difficulty enum
 		Difficulty mode;
 
 		switch (choice)
@@ -163,7 +174,7 @@ int main()
 		std::cout << "Guess the number between " << MIN << " and " << MAX << ".\n";
 
 		int attempts = playGame(target, max_attempts);
-		int* best = nullptr;
+		int *best = nullptr;
 
 
 		if (mode == Difficulty::Easy)
@@ -179,6 +190,7 @@ int main()
 			best = &best_hard;
 		}
 
+        // Update best score for the selected difficulty if player won
 		if (attempts != -1 && attempts < *best)
 		{
 			*best = attempts;
@@ -195,6 +207,7 @@ int main()
 			{
 				std::cin.clear();
 				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                // Handle invalid replay/quit input
 				std::cout << "Invalid input. Please enter 'r' or 'q'.\n";
 				continue;
 			}
